@@ -30,8 +30,8 @@
 #'    \itemize{
 #'      \item variable - Variable names extracted from colnames(Sigma0)
 #'      \item mean - Posterior mean
-#'      \item [(1-CI_level)/2]$% - lower CI bound
-#'      \item [1 - (1-CI_level)/2]$% - upper CI bound
+#'      \item [(1-CI_level)/2]% - lower CI bound
+#'      \item [1 - (1-CI_level)/2]% - upper CI bound
 #'    }
 #' \item nu the SUBSET shrinkage parameter either fixed by the user or selected by Bayes factor
 #' \item ESS the effective sample size
