@@ -104,7 +104,7 @@ COSET= function(draws0,
 
 
   find_dist = function(theta){
-    settings <- osqpSettings()
+    settings <- osqpSettings(verbose = FALSE)
     model <- osqp(P = diag(p), q = -theta, A =  Con_Matrix, l =  lb, u = ub, settings)
     res = model$Solve()
     dist(round(rbind(res$x, theta),5))
