@@ -216,7 +216,7 @@ COSET= function(draws0,
       }
       nu = optimize(best_nu_waic,
                     interval = c(0, nu_max))$min
-      nu = ifelse(best_nu_waic(0) < best_nu_waic(nu),0,nu)
+      nu = ifelse(best_nu_waic(0) <= best_nu_waic(nu),0,nu)
       if(nu == 0) cat("\n 0 Chosen as Best Fitting nu \n")
     }
   }
