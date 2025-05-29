@@ -188,6 +188,8 @@ COSET= function(draws0,
       }
       nu = optimize(best_nu_bf,
                     interval = c(0,nu_max))$min
+      nu = ifelse(best_nu_bf(0) <= best_nu_bf(nu),0,nu)
+      if(nu == 0) cat("\n 0 Chosen as Best Fitting nu \n")
     }
     else{
       ## Get IS weights
