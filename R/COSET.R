@@ -213,7 +213,7 @@ COSET= function(draws0,
         ppd = exp(draws0$logLik)*w_k
         lppd = get_lppd_nu(ppd)
         lppd_var = get_lppd_var_nu(ppd)
-        waic = lppd - lppd_var
+        waic = -2*lppd + 2*lppd_var
         waic
       }
       nu = optimize(best_nu_waic,
