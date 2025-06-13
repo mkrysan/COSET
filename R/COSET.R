@@ -133,6 +133,11 @@ COSET= function(draws0,
       exp(-.5 * dist_tilde_w)
   }
 
+  if(sum(dist_w) == 0){
+    cat("\n No posterior samples outside of subspace. No shrinkage required.")
+    return(NULL)
+  }
+
   ## Create function that creates w_k(\nu)
   if(missing(cl)){
     get_w_k = function(nu){
