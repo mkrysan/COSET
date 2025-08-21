@@ -140,34 +140,39 @@ COSET= function(draws0,
   }
   ## Create function that creates w_k(\nu)
   if(missing(cl)){
-    get_w_k = function(nu){
-      w_1^nu
+    if(model_selection == "bayes_factor"){
+      get_w_k = function(nu){
+        w_1^nu
+      }
+      get_wtilde_k = function(nu){
+        wtilde_1^nu
+      }
+      get_w_k_is = function(nu){
+        w_k = get_w_k(nu)
+        w_k_sum = sum(w_k)
+        w_k = w_k / ifelse(w_k_sum == 0,1,w_k_sum)
+        w_k
+      }
     }
-    get_wtilde_k = function(nu){
-      wtilde_1^nu
-    }
-    get_w_k_is = function(nu){
-      w_k = get_w_k(nu)
-      w_k_sum = sum(w_k)
-      w_k = w_k / ifelse(w_k_sum == 0,1,w_k_sum)
-      w_k
-    }
-    ## Get optimal nu according to WAIC
-    get_lppd_nu = function(ppd_nu){
-      sum(log(colSums(ppd_nu)))
-    }
+    else{
+      # Get optimal nu according to WAIC
+      get_lppd_nu = function(ppd_nu){
+        sum(log(colSums(ppd_nu)))
+      }
 
-    get_lppd_var_nu = function(ppd_nu){
-      sum(colSums((ppd_nu)^2) - (colSums(ppd_nu))^2)
+      get_lppd_var_nu = function(ppd_nu){
+        sum(colSums((ppd_nu)^2) - (colSums(ppd_nu))^2)
+      }
+      best_nu_waic = function(nu){
+        w_k = get_w_k_is(nu)
+        ppd = exp(draws0$logLik)*w_k
+        lppd = get_lppd_nu(ppd)
+        lppd_var = get_lppd_var_nu(ppd)
+        waic = -2*lppd + 2*lppd_var
+        waic
+      }
     }
-    best_nu_waic = function(nu){
-      w_k = get_w_k_is(nu)
-      ppd = exp(draws0$logLik)*w_k
-      lppd = get_lppd_nu(ppd)
-      lppd_var = get_lppd_var_nu(ppd)
-      waic = -2*lppd + 2*lppd_var
-      waic
-    }
+    #
   }else{
     clusterExport(cl,c("w_1","wtilde_1"),envir = environment())
     get_w_k = function(nu){
