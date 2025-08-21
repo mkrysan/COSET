@@ -104,7 +104,7 @@ COSET= function(draws0,
 
 
   find_dist = function(theta){
-    settings <- osqpSettings(verbose = FALSE)
+    settings <- osqp::osqpSettings(verbose = FALSE)
     model <- osqp(P = diag(p), q = -theta, A =  Con_Matrix, l =  lb, u = ub, settings)
     res = model$Solve()
     dist(round(rbind(res$x, theta),5))
@@ -217,8 +217,7 @@ COSET= function(draws0,
                     interval = c(0,nu_max))$min
       nu = ifelse(best_nu_bf(0) <= best_nu_bf(nu),0,nu)
       if(nu == 0) cat("\n 0 Chosen as Best Fitting nu \n")
-    }
-    else{
+    } else{
       ## Get IS weights
 
       nu = optimize(best_nu_waic,
