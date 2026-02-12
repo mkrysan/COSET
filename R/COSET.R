@@ -78,25 +78,23 @@ COSET= function(draws0,
 
   model_selection = tolower(model_selection)
 
+  if(verbose)
+
+
   if(verbose){
-    if(!model_selection %in% c("waic", "bayes_factor", "bayes factor")){
-      if("logLik" %in% names(draws0)){
-        model_selection = "waic"
-      }else{
-        model_selection = "bayes_factor"
-        cat("\nNo model selection method chosen. Picking level of shrinkage via Bayes Factor.")
+    if(missing(nu)){
+      if(model_selection %in% c("waic", "WAIC")){
+        if(!"logLik" %in% names(draws0)){
+          model_selection = "bayes_factor"
+          cat("\nNo nu provided. WAIC selected, but no logLik draws provided.
+              \nPicking level of shrinkage via Bayes Factor.\n")
+        } else{
+          cat("\nNo nu provided. Picking level of shrinkage via WAIC.\n")
+        }
       }
-    }
-  }
-
-  if(model_selection == "bayes factor") model_selection = "bayes_factor"
-
-  if(verbose)if(missing(nu))cat("\nNo nu provided.  Picking level of shrinkage via Bayes Factor.\n")
-
-  if(verbose){
-    if(model_selection == "bayes_factor" && !"logLik" %in% names(draws0)) {
-      bayes_factor = TRUE
-      cat("\nNo logLikelihood draws provided.  Picking level of shrinkage via Bayes Factor.")
+      else{
+        cat("\nNo nu provied. Picking level of shrinkage via Bayes Factor.\n")
+      }
     }
   }
 
@@ -105,7 +103,7 @@ COSET= function(draws0,
 
   find_dist = function(theta){
     settings <- osqp::osqpSettings(verbose = FALSE)
-    model <- osqp(P = diag(p), q = -theta, A =  Con_Matrix, l =  lb, u = ub, settings)
+    model <- osqp::osqp(P = diag(p), q = -theta, A =  Con_Matrix, l =  lb, u = ub, settings)
     res = model$Solve()
     dist(round(rbind(res$x, theta),5))
   }
@@ -140,7 +138,7 @@ COSET= function(draws0,
   }
   ## Create function that creates w_k(\nu)
   if(missing(cl)){
-    if(model_selection == "bayes_factor"){
+    #if(model_selection == "bayes_factor"){
       get_w_k = function(nu){
         w_1^nu
       }
@@ -153,8 +151,8 @@ COSET= function(draws0,
         w_k = w_k / ifelse(w_k_sum == 0,1,w_k_sum)
         w_k
       }
-    }
-    else{
+    #}
+    #else{
       # Get optimal nu according to WAIC
       get_lppd_nu = function(ppd_nu){
         sum(log(colSums(ppd_nu)))
@@ -171,8 +169,8 @@ COSET= function(draws0,
         waic = -2*lppd + 2*lppd_var
         waic
       }
-    }
-    #
+    #}
+
   }else{
     clusterExport(cl,c("w_1","wtilde_1"),envir = environment())
     get_w_k = function(nu){
@@ -257,9 +255,12 @@ COSET= function(draws0,
   # Get ESS
   ESS = 1 / sum(w_k^2)
 
+
   # Get point estimates
   theta_hat =
     apply(draws0$posterior,2,weighted.mean,w = w_k)
+
+
 
   # Get CI
   get_CI_from_IS = function(x,w){
